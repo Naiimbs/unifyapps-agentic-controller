@@ -284,6 +284,13 @@ const MIME_TYPES = {
   '.ico': 'image/x-icon'
 };
 
+// Active SSE Sessions: sessionId -> { res, createdAt }
+const sseSessions = new Map();
+
+function generateSessionId() {
+  return 'sess_' + Date.now().toString(36) + '_' + Math.random().toString(36).slice(2, 9);
+}
+
 // Create HTTP Server
 const server = http.createServer(async (req, res) => {
   const reqUrl = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
@@ -292,7 +299,7 @@ const server = http.createServer(async (req, res) => {
   // Add Global CORS Headers for Manus and AI web clients
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, DELETE');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept');
 
   // Handle Preflight OPTIONS
   if (req.method === 'OPTIONS') {
@@ -301,7 +308,7 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 1. Healthcheck Route
+  // 1. Healthcheck Route (GET /health)
   if (pathname === '/health') {
     res.writeHead(200, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify({
@@ -309,10 +316,11 @@ const server = http.createServer(async (req, res) => {
       service: 'unifyapps-agentic-controller',
       mcp: 'active',
       version: '1.0.0',
+      activeSseSessions: sseSessions.size,
       tenant: UNIFY_CONFIG.baseUrl,
       toolsCount: TOOLS.length,
       timestamp: new Date().toISOString()
-    }));
+    }, null, 2));
     return;
   }
 
@@ -323,20 +331,78 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 3. MCP JSON-RPC 2.0 Endpoint (POST /mcp, POST /mcp/messages, POST /)
-  if (req.method === 'POST' && (pathname === '/mcp' || pathname === '/mcp/messages' || pathname === '/mcp/jsonrpc' || pathname === '/')) {
+  // 3. MCP SSE Stream Endpoint (GET /mcp/sse, GET /sse, or GET /mcp with event-stream)
+  const isSseRequest = (pathname === '/mcp/sse' || pathname === '/sse') || 
+                       (pathname === '/mcp' && req.headers.accept && req.headers.accept.includes('text/event-stream'));
+
+  if (req.method === 'GET' && isSseRequest) {
+    const sessionId = generateSessionId();
+
+    res.writeHead(200, {
+      'Content-Type': 'text/event-stream',
+      'Cache-Control': 'no-cache, no-transform',
+      'Connection': 'keep-alive',
+      'X-Accel-Buffering': 'no', // Critical: disables reverse-proxy buffering (Nginx, Traefik, Caddy)
+      'Access-Control-Allow-Origin': '*'
+    });
+
+    sseSessions.set(sessionId, { res, createdAt: Date.now() });
+
+    // Determine public endpoint URL (handling reverse proxy SSL termination)
+    const proto = req.headers['x-forwarded-proto'] || (req.headers.host && req.headers.host.includes('mhaf.cloud') ? 'https' : 'http');
+    const host = req.headers['x-forwarded-host'] || req.headers.host || 'localhost:3000';
+    const endpointUrl = `${proto}://${host}/mcp/messages?sessionId=${sessionId}`;
+
+    // MCP SSE Specification: immediately send 'endpoint' event with the target POST URI
+    res.write(`event: endpoint\ndata: ${endpointUrl}\n\n`);
+
+    // Keepalive ping every 15s to keep connection open across firewalls
+    const keepAliveTimer = setInterval(() => {
+      try {
+        res.write(': keepalive\n\n');
+      } catch (_) {}
+    }, 15000);
+
+    req.on('close', () => {
+      clearInterval(keepAliveTimer);
+      sseSessions.delete(sessionId);
+    });
+    return;
+  }
+
+  // 4. MCP JSON-RPC 2.0 Message Endpoint (POST /mcp/messages, POST /mcp, POST /)
+  if (req.method === 'POST' && (pathname === '/mcp/messages' || pathname === '/mcp' || pathname === '/')) {
+    const sessionId = reqUrl.searchParams.get('sessionId');
     let body = '';
     req.on('data', chunk => { body += chunk; });
     req.on('end', async () => {
       try {
         const json = JSON.parse(body);
         const rpcResponse = await handleJsonRpc(json);
-        if (rpcResponse) {
-          res.writeHead(200, { 'Content-Type': 'application/json' });
-          res.end(JSON.stringify(rpcResponse));
+        const activeSession = sessionId ? sseSessions.get(sessionId) : null;
+
+        if (activeSession && rpcResponse) {
+          // MCP SSE standard: Deliver response via SSE 'message' event
+          activeSession.res.write(`event: message\ndata: ${JSON.stringify(rpcResponse)}\n\n`);
+
+          // Respond 202 Accepted to POST caller
+          res.writeHead(202, {
+            'Content-Type': 'application/json',
+            'Access-Control-Allow-Origin': '*'
+          });
+          res.end(JSON.stringify({ status: 'accepted', sessionId }));
         } else {
-          res.writeHead(204);
-          res.end();
+          // Direct HTTP JSON-RPC mode (return result directly in HTTP response body)
+          if (rpcResponse) {
+            res.writeHead(200, {
+              'Content-Type': 'application/json',
+              'Access-Control-Allow-Origin': '*'
+            });
+            res.end(JSON.stringify(rpcResponse));
+          } else {
+            res.writeHead(204, { 'Access-Control-Allow-Origin': '*' });
+            res.end();
+          }
         }
       } catch (err) {
         res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -350,25 +416,16 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 4. MCP SSE Stream Endpoint (GET /mcp, GET /mcp/sse, GET /sse)
-  if (req.method === 'GET' && (pathname === '/mcp/sse' || pathname === '/sse' || (pathname === '/mcp' && req.headers.accept && req.headers.accept.includes('text/event-stream')))) {
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      'Connection': 'keep-alive',
-      'Access-Control-Allow-Origin': '*'
-    });
-
-    // Send initial endpoint event as required by MCP SSE specification
-    res.write(`event: endpoint\ndata: ${parsedUrl.protocol || 'http:'}//${req.headers.host}/mcp/messages\n\n`);
-
-    const interval = setInterval(() => {
-      res.write(': keepalive\n\n');
-    }, 15000);
-
-    req.on('close', () => {
-      clearInterval(interval);
-    });
+  // If visiting /mcp via GET from browser, show JSON documentation
+  if (req.method === 'GET' && pathname === '/mcp') {
+    res.writeHead(200, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      message: 'UnifyApps Remote MCP Server is active.',
+      sseEndpoint: '/mcp/sse',
+      messageEndpoint: '/mcp/messages',
+      protocol: 'Model Context Protocol (SSE & HTTP JSON-RPC 2.0)',
+      tools: TOOLS.map(t => t.name)
+    }, null, 2));
     return;
   }
 
