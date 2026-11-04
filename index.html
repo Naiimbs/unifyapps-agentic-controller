@@ -1,0 +1,846 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>UnifyApps Autonomous Agentic Controller | Tri-Layer Architecture</title>
+  <meta name="description" content="Autonomous Design System & Interface Engineering Controller for UnifyApps via MCP, A2A, and API Gateway.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mod: {
+              green: '#125939',
+              greenDark: '#0b3824',
+              greenLight: '#1b7d51',
+              gold: '#dba102',
+              goldLight: '#f5b81a',
+              surface: '#f8fafc',
+              border: '#e2e8f0',
+              text: '#0f172a'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <!-- Font Awesome / Lucide style SVG icons -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    pre, code { font-family: 'JetBrains Mono', monospace; }
+    .badge-pulse {
+      animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: .5; }
+    }
+    .gradient-hero {
+      background: radial-gradient(circle at 50% 0%, rgba(18, 89, 57, 0.12) 0%, rgba(255, 255, 255, 0) 70%);
+    }
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f5f9;
+    }
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 3px;
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-mod-green selection:text-white">
+
+  <!-- =========================================================================
+       NAVIGATION BAR
+       ========================================================================= -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-mod-green flex items-center justify-center text-white font-bold text-xl shadow-sm border border-mod-greenDark">
+          U
+        </div>
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-slate-900 text-lg tracking-tight">UnifyApps</span>
+            <span class="text-xs px-2 py-0.5 rounded-full bg-mod-green/10 text-mod-green font-semibold border border-mod-green/20">Agentic Bridge</span>
+          </div>
+          <span class="text-xs text-slate-500 hidden sm:inline">Saudi MODHS Digital Services</span>
+        </div>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <a href="#architecture" class="hover:text-mod-green transition-colors">Architecture</a>
+        <a href="#simulator" class="hover:text-mod-green transition-colors">Interactive Demo</a>
+        <a href="#walkthrough" class="hover:text-mod-green transition-colors">Step-by-Step Guide</a>
+        <a href="#configurations" class="hover:text-mod-green transition-colors">AI Tool Config</a>
+        <a href="#connectors" class="hover:text-mod-green transition-colors">Custom Connectors</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="#simulator" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 badge-pulse"></span>
+          Live Simulator
+        </a>
+        <a href="https://github.com/Naiimbs/unifyapps-agentic-controller" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-mod-green hover:bg-mod-greenDark text-white text-xs font-semibold shadow-sm transition-all shadow-mod-green/20">
+          <svg class="w-4 h-4 fill-current" viewBox="0 0 24 24"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/></svg>
+          GitHub Repo
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       HERO SECTION
+       ========================================================================= -->
+  <section class="relative pt-16 pb-20 overflow-hidden gradient-hero border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <!-- Live Status Badges -->
+      <div class="flex flex-wrap items-center gap-2 mb-8 justify-center">
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800 border border-emerald-200">
+          <span class="w-2 h-2 rounded-full bg-emerald-500 badge-pulse"></span>
+          A2A Server: Active (App page builder)
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800 border border-blue-200">
+          <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+          MCP Server: Tools Ready (e_6aeaeef3...)
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800 border border-purple-200">
+          <span class="w-2 h-2 rounded-full bg-purple-500"></span>
+          API Client: Authorized (6aeaedcf...)
+        </span>
+        <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-amber-100 text-amber-800 border border-amber-200">
+          <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+          Tenant: unifyapps-dev.modhs.med.sa
+        </span>
+      </div>
+
+      <div class="text-center max-w-4xl mx-auto">
+        <h1 class="text-4xl sm:text-5xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          Autonomous Design System & Interface Controller for <span class="text-mod-green underline decoration-mod-gold decoration-4 underline-offset-8">UnifyApps</span>
+        </h1>
+        <p class="mt-6 text-lg sm:text-xl text-slate-600 leading-relaxed max-w-3xl mx-auto font-normal">
+          Empowering external AI coding agents (Antigravity, Claude, Cursor, Copilot) to construct, style, and package enterprise UI directly inside UnifyApps—with <strong class="text-slate-900 font-semibold">zero manual drag-and-drop toil</strong>, <strong class="text-slate-900 font-semibold">surgical block-scoped CSS isolation</strong>, and <strong class="text-slate-900 font-semibold">100% brand fidelity</strong>.
+        </p>
+
+        <div class="mt-10 flex flex-wrap gap-4 justify-center items-center">
+          <a href="#simulator" class="px-6 py-3.5 rounded-xl bg-mod-green hover:bg-mod-greenDark text-white font-semibold text-sm shadow-lg shadow-mod-green/25 transition-all flex items-center gap-2">
+            <span>Launch Live Interactive Simulator</span>
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"/></svg>
+          </a>
+          <a href="#architecture" class="px-6 py-3.5 rounded-xl bg-white hover:bg-slate-50 text-slate-800 font-semibold text-sm border border-slate-300 shadow-sm transition-all flex items-center gap-2">
+            <span>Explore Tri-Layer Architecture</span>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Metrics Grid -->
+      <div class="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 max-w-5xl mx-auto">
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <div class="text-3xl font-extrabold text-mod-green">0%</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Global Layout Side Effects</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Strict [data-block-id] Scoping</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <div class="text-3xl font-extrabold text-mod-green">10x</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Faster Component Delivery</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Prompt-to-AST Synthesis</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <div class="text-3xl font-extrabold text-mod-green">100%</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Brand Token Compliance</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">Saudi MOD Green & Gold</div>
+        </div>
+        <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm text-center">
+          <div class="text-3xl font-extrabold text-mod-green">Universal</div>
+          <div class="text-xs text-slate-500 font-medium mt-1">Cross-App Reusability</div>
+          <div class="text-[11px] text-slate-400 mt-0.5">One-click Module Packaging</div>
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       TRI-LAYER ARCHITECTURE SECTION
+       ========================================================================= -->
+  <section id="architecture" class="py-20 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green px-3 py-1 rounded-full bg-mod-green/10 border border-mod-green/20">System Architecture</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">The Tri-Layer Integration Engine</h2>
+        <p class="text-slate-600 mt-3 text-base">
+          Connecting AI tooling to UnifyApps through three complementary protocols: REST APIs, Model Context Protocol (MCP), and Agent-to-Agent (A2A) negotiation.
+        </p>
+      </div>
+
+      <!-- Architecture Interactive Cards -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Layer 1: API Gateway -->
+        <div class="bg-slate-50 rounded-2xl p-7 border border-slate-200 hover:border-purple-300 transition-all shadow-sm hover:shadow-md flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-purple-100 text-purple-700 flex items-center justify-center font-bold text-lg mb-5 border border-purple-200">
+              01
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xl font-bold text-slate-900">API Gateway</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-purple-100 text-purple-700">OAuth2 / Bearer</span>
+            </div>
+            <div class="text-xs font-mono text-slate-500 mb-4 bg-white p-2 rounded border border-slate-200">Client: Antigravity-Agent-Bridge<br>ID: 6aeaedcf41af9153531ebb1f</div>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+              The foundational enterprise authorization bridge. Enables authenticated CRUD on tenant workspaces, page metadata, JSON AST components, custom connectors, and publishing states.
+            </p>
+            <ul class="text-xs text-slate-500 space-y-2 font-medium">
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Tenant Workspace Management</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Direct AST Serialization & Persistence</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Access Profiles & Activity Auditing</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-400 font-mono">
+            Endpoint: /p/0/api-platform/clients
+          </div>
+        </div>
+
+        <!-- Layer 2: MCP Server -->
+        <div class="bg-slate-50 rounded-2xl p-7 border border-slate-200 hover:border-blue-300 transition-all shadow-sm hover:shadow-md flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-lg mb-5 border border-blue-200">
+              02
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xl font-bold text-slate-900">MCP Server</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-blue-100 text-blue-700">JSON-RPC / SSE</span>
+            </div>
+            <div class="text-xs font-mono text-slate-500 mb-4 bg-white p-2 rounded border border-slate-200">Server: Antigravity-Unify-MCP<br>ID: e_6aeaeef394cbd46d9f75d981</div>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+              The direct AI context interface. Exposes platform tools directly into the reasoning loop of LLMs so agents can query the canvas, locate block IDs, and write Monaco CSS.
+            </p>
+            <ul class="text-xs text-slate-500 space-y-2 font-medium">
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Tool: unify_get_page_blocks()</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Tool: unify_apply_scoped_css()</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Tool: unify_set_html_attributes()</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-400 font-mono">
+            Endpoint: /p/0/mcp-servers/tools
+          </div>
+        </div>
+
+        <!-- Layer 3: A2A Multi-Agent Server -->
+        <div class="bg-slate-50 rounded-2xl p-7 border border-slate-200 hover:border-emerald-300 transition-all shadow-sm hover:shadow-md flex flex-col justify-between">
+          <div>
+            <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-lg mb-5 border border-emerald-200">
+              03
+            </div>
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-xl font-bold text-slate-900">A2A Multi-Agent</h3>
+              <span class="text-[11px] font-semibold px-2 py-0.5 rounded bg-emerald-100 text-emerald-700 font-bold">Active / Deployed</span>
+            </div>
+            <div class="text-xs font-mono text-slate-500 mb-4 bg-white p-2 rounded border border-slate-200">Server: Antigravity-Unify-A2A<br>Agent: App page builder (e_69b267...)</div>
+            <p class="text-sm text-slate-600 leading-relaxed mb-4">
+              Agent-to-Agent protocol integration. External AI delegates complex UI page layout, responsive columns, and data source wiring directly to UnifyApps' internal builder agent.
+            </p>
+            <ul class="text-xs text-slate-500 space-y-2 font-medium">
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Get Agent Card (.well-known)</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Handle JSON-RPC Invocations</li>
+              <li class="flex items-center gap-2"><svg class="w-4 h-4 text-emerald-500 shrink-0" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>Real-time Streaming Responses</li>
+            </ul>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-200 text-xs text-slate-400 font-mono">
+            Collection: 6aeaf23341af9153531ebb24
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       LIVE INTERACTIVE SIMULATOR (THE CORE DEMO)
+       ========================================================================= -->
+  <section id="simulator" class="py-20 bg-slate-900 text-slate-100 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="flex flex-col md:flex-row md:items-end justify-between mb-12">
+        <div>
+          <span class="text-xs font-bold uppercase tracking-wider text-mod-gold px-3 py-1 rounded-full bg-mod-gold/10 border border-mod-gold/20">Live Interactive Playground</span>
+          <h2 class="text-3xl sm:text-4xl font-extrabold text-white mt-3 tracking-tight">Surgical Block-Scoped Styling Engine</h2>
+          <p class="text-slate-400 mt-2 max-w-2xl text-sm">
+            Experience how the agent injects CSS into Monaco scoped exclusively to <code class="text-emerald-400 bg-slate-800 px-1.5 py-0.5 rounded text-xs">[data-block-id='...']</code>, guaranteeing zero layout side effects on the surrounding application.
+          </p>
+        </div>
+        
+        <!-- Preset Controls -->
+        <div class="mt-6 md:mt-0 flex flex-wrap gap-2">
+          <button id="btnPresetMod" onclick="applyPreset('mod')" class="px-3.5 py-2 rounded-lg bg-mod-green hover:bg-mod-greenLight text-white text-xs font-semibold shadow transition-all flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-mod-gold"></span>
+            Saudi MOD Theme
+          </button>
+          <button id="btnPresetRTL" onclick="toggleRTL()" class="px-3.5 py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold transition-all">
+            Toggle Arabic (RTL)
+          </button>
+          <button id="btnPresetModule" onclick="triggerModuleModal()" class="px-3.5 py-2 rounded-lg bg-amber-500/20 text-amber-300 border border-amber-500/30 hover:bg-amber-500/30 text-xs font-semibold transition-all flex items-center gap-1.5">
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/></svg>
+            Package Module
+          </button>
+        </div>
+      </div>
+
+      <!-- Playground Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 bg-slate-950 p-4 sm:p-6 rounded-2xl border border-slate-800 shadow-2xl">
+        
+        <!-- Left: AST Block Hierarchy (Col 3) -->
+        <div class="lg:col-span-3 bg-slate-900 rounded-xl p-4 border border-slate-800">
+          <div class="flex items-center justify-between pb-3 mb-3 border-b border-slate-800 text-xs font-semibold text-slate-400">
+            <span>UNIFYAPPS AST TREE</span>
+            <span class="text-[10px] bg-slate-800 px-1.5 py-0.5 rounded text-emerald-400">LIVE</span>
+          </div>
+          
+          <div class="space-y-1 font-mono text-xs">
+            <div class="p-2 rounded hover:bg-slate-800 text-slate-400 flex items-center gap-2 cursor-pointer">
+              <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+              <span>body</span>
+            </div>
+            <div class="pl-4 space-y-1">
+              <div class="p-2 rounded hover:bg-slate-800 text-slate-400 flex items-center gap-2 cursor-pointer">
+                <svg class="w-3.5 h-3.5 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                <span>stack173</span>
+              </div>
+              <div class="pl-4 space-y-1">
+                <div class="p-2 rounded bg-mod-green/20 text-emerald-400 border border-mod-green/40 flex items-center justify-between cursor-pointer">
+                  <div class="flex items-center gap-1.5">
+                    <svg class="w-3.5 h-3.5 text-mod-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/></svg>
+                    <span class="font-bold">filters</span>
+                  </div>
+                  <span class="text-[10px] text-slate-400">b_cvQmi</span>
+                </div>
+                <div class="p-2 rounded hover:bg-slate-800 text-slate-400 flex items-center gap-2 cursor-pointer">
+                  <span class="w-3.5 h-3.5 inline-block text-center text-slate-500">•</span>
+                  <span>viewToggle</span>
+                </div>
+              </div>
+            </div>
+            <div class="p-2 rounded hover:bg-slate-800 text-slate-400 flex items-center gap-2 cursor-pointer">
+              <span class="w-3.5 h-3.5 inline-block text-center text-slate-500">•</span>
+              <span>contentTable</span>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-800 text-[11px] text-slate-400 space-y-1">
+            <div class="text-slate-300 font-semibold mb-1">Target Component:</div>
+            <div>Name: <span class="text-white font-mono">filters</span></div>
+            <div>Block ID: <span class="text-emerald-400 font-mono">b_cvQmi</span></div>
+            <div>Status: <span class="text-emerald-400 font-bold">Scoped Active</span></div>
+          </div>
+        </div>
+
+        <!-- Middle: Monaco CSS Editor (Col 5) -->
+        <div class="lg:col-span-5 bg-slate-900 rounded-xl border border-slate-800 flex flex-col overflow-hidden">
+          <div class="flex items-center justify-between px-4 py-2.5 bg-slate-950 border-b border-slate-800">
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-red-500"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-yellow-500"></span>
+              <span class="w-2.5 h-2.5 rounded-full bg-green-500"></span>
+              <span class="ml-2 text-xs font-mono text-slate-400">Monaco Editor • Custom CSS</span>
+            </div>
+            <span class="text-[10px] font-mono text-mod-gold bg-mod-gold/10 px-2 py-0.5 rounded">Scoping: Strict</span>
+          </div>
+
+          <div class="p-4 flex-1 font-mono text-xs leading-relaxed custom-scrollbar overflow-y-auto">
+            <textarea id="cssEditor" oninput="updatePreviewFromEditor()" class="w-full h-80 bg-transparent text-slate-200 outline-none resize-none font-mono text-xs leading-relaxed" spellcheck="false">[data-block-id='b_cvQmi'] {
+  background: #ffffff;
+  border: 2px solid #125939;
+  border-radius: 12px;
+  padding: 14px 20px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+[data-block-id='b_cvQmi'] .search-input {
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 14px;
+  font-size: 13px;
+  color: #0f172a;
+}
+
+[data-block-id='b_cvQmi'] .action-btn {
+  background: #125939;
+  color: #ffffff;
+  font-weight: 600;
+  border-radius: 8px;
+  padding: 8px 16px;
+}</textarea>
+          </div>
+
+          <div class="px-4 py-2 bg-slate-950 border-t border-slate-800 flex items-center justify-between text-[11px] text-slate-400">
+            <span id="editorStatusText">✓ Changes synced to UnifyApps AST</span>
+            <button onclick="resetEditor()" class="hover:text-white transition-colors">Reset</button>
+          </div>
+        </div>
+
+        <!-- Right: Live Canvas Preview (Col 4) -->
+        <div class="lg:col-span-4 bg-slate-100 rounded-xl border border-slate-300 flex flex-col overflow-hidden text-slate-900">
+          <div class="px-4 py-2.5 bg-white border-b border-slate-200 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold text-slate-700">Live Preview</span>
+              <span class="text-[10px] px-1.5 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">Isolated</span>
+            </div>
+            <span id="rtlBadge" class="text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono">LTR</span>
+          </div>
+
+          <!-- The Canvas Area -->
+          <div class="p-4 flex-1 flex flex-col justify-center items-center bg-slate-50 min-h-[320px]">
+            
+            <!-- Outside Block (Must remain unaffected!) -->
+            <div class="w-full text-slate-400 text-[10px] uppercase font-bold tracking-wider mb-2 flex justify-between">
+              <span>Adjacent Component</span>
+              <span class="text-emerald-600">✓ Zero Leakage</span>
+            </div>
+            <div class="w-full bg-white border border-slate-200 rounded-lg p-2.5 text-xs text-slate-500 mb-4 flex items-center justify-between">
+              <span>Page Header / Navigation</span>
+              <span class="px-2 py-0.5 bg-slate-100 rounded text-[10px]">Unaffected</span>
+            </div>
+
+            <!-- Target Scoped Component: filters -->
+            <div class="w-full text-mod-green text-[10px] uppercase font-bold tracking-wider mb-1 flex justify-between">
+              <span>Target: [data-block-id='b_cvQmi']</span>
+              <span class="text-mod-gold font-bold">Scoped Active</span>
+            </div>
+            
+            <div id="targetComponent" data-block-id="b_cvQmi" class="w-full transition-all duration-300" style="background: rgb(255, 255, 255); border: 2px solid rgb(18, 89, 57); border-radius: 12px; padding: 14px 20px; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 6px -1px;">
+              <input type="text" placeholder="Search files, patients, documents..." class="search-input w-full bg-slate-50 outline-none" style="border: 1px solid rgb(203, 213, 225); border-radius: 8px; padding: 8px 14px; font-size: 13px; color: rgb(15, 23, 42);">
+              <button class="action-btn text-xs shrink-0 font-medium" style="background: rgb(18, 89, 57); color: rgb(255, 255, 255); font-weight: 600; border-radius: 8px; padding: 8px 16px;">
+                Filter
+              </button>
+            </div>
+
+            <!-- Another Outside Block -->
+            <div class="w-full bg-white border border-slate-200 rounded-lg p-3 text-xs text-slate-500 mt-4">
+              <div class="font-semibold text-slate-700 mb-1">Data Table Preview</div>
+              <div class="text-[11px] text-slate-400">Rows and styles retain default UnifyApps theme without global font distortion.</div>
+            </div>
+
+          </div>
+
+          <div class="p-3 bg-white border-t border-slate-200 text-center">
+            <span class="text-xs text-slate-500 font-medium">Computed Border: <strong class="text-mod-green font-mono">1.6px solid #125939</strong></span>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       STEP-BY-STEP DEVELOPER WALKTHROUGH
+       ========================================================================= -->
+  <section id="walkthrough" class="py-20 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green px-3 py-1 rounded-full bg-mod-green/10 border border-mod-green/20">Standard Operating Procedure</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Step-by-Step Execution Guide</h2>
+        <p class="text-slate-600 mt-3 text-base">
+          From developer prompt to a published, brand-compliant, reusable module across any UnifyApps project.
+        </p>
+      </div>
+
+      <div class="space-y-12 max-w-4xl mx-auto">
+        
+        <!-- Step 1 -->
+        <div class="flex gap-6 items-start">
+          <div class="w-12 h-12 rounded-2xl bg-mod-green text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md">
+            1
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-slate-900">API Gateway Client Authorization</h3>
+              <span class="text-xs font-mono text-purple-700 bg-purple-100 px-2.5 py-0.5 rounded">OAuth2</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">
+              Authenticate using the registered client <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">Antigravity-Agent-Bridge</code> (ID: <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">6aeaedcf41af9153531ebb1f</code>) to obtain a Bearer Token for tenant API calls.
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+              curl -X POST https://unifyapps-dev.modhs.med.sa/oauth/token \<br>
+              &nbsp;&nbsp;-d "client_id=6aeaedcf41af9153531ebb1f" \<br>
+              &nbsp;&nbsp;-d "grant_type=client_credentials"
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="flex gap-6 items-start">
+          <div class="w-12 h-12 rounded-2xl bg-mod-green text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md">
+            2
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Connect External AI Agent via MCP</h3>
+              <span class="text-xs font-mono text-blue-700 bg-blue-100 px-2.5 py-0.5 rounded">Model Context Protocol</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">
+              Configure the MCP server <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">Antigravity-Unify-MCP</code> in your AI tool (Antigravity, Cursor, Claude) to query live canvas AST and tools.
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+              // Call MCP Tool<br>
+              const { blocks } = await mcp.callTool('unify_get_page_blocks', {<br>
+              &nbsp;&nbsp;appId: 'media-center-app',<br>
+              &nbsp;&nbsp;pageSlug: 'myspace'<br>
+              });
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="flex gap-6 items-start">
+          <div class="w-12 h-12 rounded-2xl bg-mod-green text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md">
+            3
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Delegate Layout Generation via A2A</h3>
+              <span class="text-xs font-mono text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded font-bold">A2A Protocol</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">
+              Send a natural language layout request to the deployed A2A server <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">Antigravity-Unify-A2A</code>. UnifyApps' built-in <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">App page builder</code> generates the component tree.
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+              POST /p/0/api-platform/collections/6aeaf23341af9153531ebb24/HandleJSONRPC<br>
+              { "method": "build_component", "params": { "prompt": "Create filter bar with search & date picker" } }
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="flex gap-6 items-start">
+          <div class="w-12 h-12 rounded-2xl bg-mod-green text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md">
+            4
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Surgical Block-Scoped CSS Injection</h3>
+              <span class="text-xs font-mono text-amber-700 bg-amber-100 px-2.5 py-0.5 rounded">Zero Leakage</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">
+              Inject custom CSS into Monaco scoped exclusively to <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">[data-block-id='...']</code> and configure HTML attributes (<code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">dir="rtl"</code>).
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+              [data-block-id='filters'] {<br>
+              &nbsp;&nbsp;background: #f8fafc;<br>
+              &nbsp;&nbsp;border: 1.6px solid #125939; /* Saudi MOD Green */<br>
+              &nbsp;&nbsp;border-radius: 12px;<br>
+              }
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="flex gap-6 items-start">
+          <div class="w-12 h-12 rounded-2xl bg-mod-green text-white font-extrabold text-lg flex items-center justify-center shrink-0 shadow-md">
+            5
+          </div>
+          <div class="bg-slate-50 rounded-2xl p-6 border border-slate-200 flex-1">
+            <div class="flex items-center justify-between mb-2">
+              <h3 class="text-lg font-bold text-slate-900">Package as Reusable Cross-App Module</h3>
+              <span class="text-xs font-mono text-emerald-700 bg-emerald-100 px-2.5 py-0.5 rounded">One-Click Reuse</span>
+            </div>
+            <p class="text-sm text-slate-600 mb-4">
+              Convert the validated block into a UnifyApps <strong>Template Component</strong> (appearing alongside <code class="text-xs bg-slate-200 px-1 py-0.5 rounded font-mono">DGA_Carousal</code>). Every app across the organization can now drag-and-drop the pre-styled component.
+            </p>
+            <div class="bg-slate-900 text-slate-200 p-3 rounded-lg text-xs font-mono overflow-x-auto">
+              unify_package_as_module({ blockId: 'filters', name: 'MODHS_Universal_FilterBar' });
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       AI CLIENT CONFIGURATION HUB
+       ========================================================================= -->
+  <section id="configurations" class="py-20 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green px-3 py-1 rounded-full bg-mod-green/10 border border-mod-green/20">AI Tool Setup</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Configure Any AI Tool</h2>
+        <p class="text-slate-600 mt-3 text-base">
+          Copy-paste ready configuration files for your favorite AI coding environment.
+        </p>
+      </div>
+
+      <!-- Tab Buttons -->
+      <div class="flex justify-center gap-2 mb-8">
+        <button onclick="switchTab('antigravity')" id="tab-antigravity" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-mod-green text-white shadow-sm transition-all">Antigravity IDE</button>
+        <button onclick="switchTab('cursor')" id="tab-cursor" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all">Cursor</button>
+        <button onclick="switchTab('claude')" id="tab-claude" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all">Claude Desktop</button>
+        <button onclick="switchTab('vscode')" id="tab-vscode" class="tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all">VS Code</button>
+      </div>
+
+      <!-- Tab Contents -->
+      <div class="max-w-4xl mx-auto bg-slate-900 rounded-2xl p-6 border border-slate-800 shadow-xl text-slate-200 font-mono text-xs">
+        
+        <div id="content-antigravity" class="tab-content block">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-800 text-slate-400">
+            <span>~/.gemini/antigravity/mcp/unifyapps.json</span>
+            <button onclick="copySnippet('snippet-antigravity')" class="text-mod-gold hover:underline">Copy Config</button>
+          </div>
+          <pre id="snippet-antigravity" class="overflow-x-auto text-emerald-400 leading-relaxed">{
+  "name": "unifyapps",
+  "command": "node",
+  "args": [
+    "./scratch/unifyapps_bridge.js",
+    "--mcp"
+  ],
+  "env": {
+    "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
+    "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
+  }
+}</pre>
+        </div>
+
+        <div id="content-cursor" class="tab-content hidden">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-800 text-slate-400">
+            <span>.cursor/mcp.json</span>
+            <button onclick="copySnippet('snippet-cursor')" class="text-mod-gold hover:underline">Copy Config</button>
+          </div>
+          <pre id="snippet-cursor" class="overflow-x-auto text-blue-400 leading-relaxed">{
+  "mcp.servers": {
+    "unifyapps": {
+      "type": "command",
+      "command": "node",
+      "args": ["./scratch/unifyapps_bridge.js", "--mcp"],
+      "env": {
+        "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
+        "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
+      }
+    }
+  }
+}</pre>
+        </div>
+
+        <div id="content-claude" class="tab-content hidden">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-800 text-slate-400">
+            <span>claude_desktop_config.json</span>
+            <button onclick="copySnippet('snippet-claude')" class="text-mod-gold hover:underline">Copy Config</button>
+          </div>
+          <pre id="snippet-claude" class="overflow-x-auto text-purple-400 leading-relaxed">{
+  "mcpServers": {
+    "unifyapps-controller": {
+      "command": "node",
+      "args": ["C:/path/to/unifyapps_bridge.js", "--mcp"],
+      "env": {
+        "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
+        "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
+      }
+    }
+  }
+}</pre>
+        </div>
+
+        <div id="content-vscode" class="tab-content hidden">
+          <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-800 text-slate-400">
+            <span>.vscode/settings.json</span>
+            <button onclick="copySnippet('snippet-vscode')" class="text-mod-gold hover:underline">Copy Config</button>
+          </div>
+          <pre id="snippet-vscode" class="overflow-x-auto text-amber-400 leading-relaxed">{
+  "github.copilot.advanced": {
+    "mcpServers": {
+      "unifyapps": {
+        "command": "node",
+        "args": ["./scratch/unifyapps_bridge.js", "--mcp"],
+        "env": {
+          "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
+          "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
+        }
+      }
+    }
+  }
+}</pre>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       CUSTOM CONNECTORS SECTION
+       ========================================================================= -->
+  <section id="connectors" class="py-20 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="text-center max-w-3xl mx-auto mb-16">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green px-3 py-1 rounded-full bg-mod-green/10 border border-mod-green/20">Custom Integrations</span>
+        <h2 class="text-3xl sm:text-4xl font-extrabold text-slate-900 mt-3 tracking-tight">Custom Connectors in UnifyApps</h2>
+        <p class="text-slate-600 mt-3 text-base">
+          Native support for custom REST endpoints, authentication flows, webhooks, and actions.
+        </p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-5xl mx-auto">
+        
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <div class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-mod-green"></span>
+            Authentication Types Supported
+          </div>
+          <ul class="text-xs text-slate-600 space-y-2">
+            <li class="flex items-center gap-2">✓ <strong>OAuth 2.0</strong> (Auth Code, Client Credentials, Refresh Flow)</li>
+            <li class="flex items-center gap-2">✓ <strong>Access Token / Bearer Token</strong></li>
+            <li class="flex items-center gap-2">✓ <strong>API Key</strong> (Header or Query Param injection)</li>
+            <li class="flex items-center gap-2">✓ <strong>Basic Auth & Custom HTTP Headers</strong></li>
+          </ul>
+        </div>
+
+        <div class="bg-slate-50 p-6 rounded-2xl border border-slate-200">
+          <div class="text-sm font-bold text-slate-900 mb-3 flex items-center gap-2">
+            <span class="w-3 h-3 rounded-full bg-mod-gold"></span>
+            Actions & Realtime Triggers
+          </div>
+          <ul class="text-xs text-slate-600 space-y-2">
+            <li class="flex items-center gap-2">✓ <strong>REST Actions</strong> (GET, POST, PUT, DELETE, PATCH)</li>
+            <li class="flex items-center gap-2">✓ <strong>Webhooks</strong> (Ingest real-time incoming events)</li>
+            <li class="flex items-center gap-2">✓ <strong>Polling Triggers</strong> (Periodic delta sync)</li>
+            <li class="flex items-center gap-2">✓ <strong>Automatic MCP Tool Conversion</strong> (Export actions to LLM tools)</li>
+          </ul>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       FOOTER
+       ========================================================================= -->
+  <footer class="bg-slate-950 text-slate-400 py-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <span class="font-bold text-white">UnifyApps Autonomous Agentic Controller</span> • Developed for Saudi MODHS Digital Services
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="#architecture" class="hover:text-white transition-colors">Architecture</a>
+        <a href="#simulator" class="hover:text-white transition-colors">Demo</a>
+        <a href="#walkthrough" class="hover:text-white transition-colors">Guide</a>
+        <a href="https://github.com/Naiimbs/unifyapps-agentic-controller" target="_blank" class="hover:text-white transition-colors">GitHub</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- =========================================================================
+       SIMULATOR INTERACTIVE LOGIC
+       ========================================================================= -->
+  <script>
+    let isRTL = false;
+
+    function applyPreset(name) {
+      const editor = document.getElementById('cssEditor');
+      const comp = document.getElementById('targetComponent');
+      if (name === 'mod') {
+        editor.value = `[data-block-id='b_cvQmi'] {\n  background: #ffffff;\n  border: 2px solid #125939;\n  border-radius: 12px;\n  padding: 14px 20px;\n  display: flex;\n  align-items: center;\n  justify-content: space-between;\n  gap: 16px;\n  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);\n}\n\n[data-block-id='b_cvQmi'] .search-input {\n  border: 1px solid #cbd5e1;\n  border-radius: 8px;\n  padding: 8px 14px;\n  font-size: 13px;\n  color: #0f172a;\n}\n\n[data-block-id='b_cvQmi'] .action-btn {\n  background: #125939;\n  color: #ffffff;\n  font-weight: 600;\n  border-radius: 8px;\n  padding: 8px 16px;\n}`;
+        comp.style.borderColor = '#125939';
+        comp.style.background = '#ffffff';
+        comp.style.borderRadius = '12px';
+        comp.querySelector('.action-btn').style.background = '#125939';
+        showToast('Applied Saudi MOD Theme!');
+      }
+    }
+
+    function toggleRTL() {
+      isRTL = !isRTL;
+      const comp = document.getElementById('targetComponent');
+      const badge = document.getElementById('rtlBadge');
+      if (isRTL) {
+        comp.setAttribute('dir', 'rtl');
+        badge.innerText = 'RTL (Arabic)';
+        badge.className = 'text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-mono font-bold';
+        showToast('Switched to Arabic RTL layout');
+      } else {
+        comp.setAttribute('dir', 'ltr');
+        badge.innerText = 'LTR';
+        badge.className = 'text-[10px] px-2 py-0.5 rounded bg-slate-100 text-slate-600 font-mono';
+        showToast('Switched to LTR layout');
+      }
+    }
+
+    function updatePreviewFromEditor() {
+      const text = document.getElementById('cssEditor').value;
+      const comp = document.getElementById('targetComponent');
+      const borderMatch = text.match(/border:\s*([^;]+);/i);
+      if (borderMatch) {
+        comp.style.border = borderMatch[1].trim();
+      }
+      const radiusMatch = text.match(/border-radius:\s*([^;]+);/i);
+      if (radiusMatch) {
+        comp.style.borderRadius = radiusMatch[1].trim();
+      }
+      const bgMatch = text.match(/background:\s*([^;]+);/i);
+      if (bgMatch) {
+        comp.style.background = bgMatch[1].trim();
+      }
+      document.getElementById('editorStatusText').innerText = '✓ Real-time CSS compiled';
+    }
+
+    function resetEditor() {
+      applyPreset('mod');
+    }
+
+    function triggerModuleModal() {
+      alert('Module Packaging Simulation:\\n\\nComponent [data-block-id=\"b_cvQmi\"] has been packaged as \"MODHS_Universal_FilterBar\"!\\n\\nIt is now registered under \"Template components\" and ready for cross-app reuse.');
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll('.tab-btn').forEach(b => {
+        b.className = 'tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-white text-slate-700 border border-slate-200 hover:bg-slate-100 transition-all';
+      });
+      document.getElementById('tab-' + name).className = 'tab-btn px-5 py-2.5 rounded-xl font-semibold text-xs bg-mod-green text-white shadow-sm transition-all';
+
+      document.querySelectorAll('.tab-content').forEach(c => c.classList.add('hidden'));
+      document.getElementById('content-' + name).classList.remove('hidden');
+    }
+
+    function copySnippet(id) {
+      const text = document.getElementById(id).innerText;
+      navigator.clipboard.writeText(text);
+      showToast('Configuration copied to clipboard!');
+    }
+
+    function showToast(msg) {
+      const el = document.createElement('div');
+      el.className = 'fixed bottom-5 right-5 z-50 bg-slate-900 text-white px-4 py-2.5 rounded-xl text-xs font-semibold shadow-2xl border border-slate-700 flex items-center gap-2 animate-bounce';
+      el.innerHTML = '<span>✓</span><span>' + msg + '</span>';
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), 2500);
+    }
+  </script>
+</body>
+</html>
