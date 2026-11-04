@@ -314,8 +314,9 @@ const server = http.createServer(async (req, res) => {
     res.end(JSON.stringify({
       status: 'ok',
       service: 'unifyapps-agentic-controller',
+      framework: 'React 18 + Vite + Express',
       mcp: 'active',
-      version: '1.0.0',
+      version: '2.0.0',
       activeSseSessions: sseSessions.size,
       tenant: UNIFY_CONFIG.baseUrl,
       toolsCount: TOOLS.length,
@@ -429,34 +430,36 @@ const server = http.createServer(async (req, res) => {
     return;
   }
 
-  // 5. Static Files Hosting (index.html, guide.html, assets, images)
-  let filePath = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
+  // 5. Static Files Hosting (Compiled React in dist/, assets, screenshots)
+  const distDir = path.join(__dirname, 'dist');
+  const hasDist = fs.existsSync(distDir);
+
+  // Check if requesting an asset from root assets (e.g. assets/images/...)
+  let targetFile = null;
+  if (pathname.startsWith('/assets/images/')) {
+    targetFile = path.join(__dirname, pathname);
+  } else if (hasDist) {
+    if (pathname === '/' || pathname === '/index.html') {
+      targetFile = path.join(distDir, 'index.html');
+    } else {
+      targetFile = path.join(distDir, pathname);
+    }
+  } else {
+    targetFile = path.join(__dirname, pathname === '/' ? 'index.html' : pathname);
+  }
 
   // Security check: prevent directory traversal
-  if (!filePath.startsWith(__dirname)) {
+  if (!targetFile.startsWith(__dirname)) {
     res.writeHead(403, { 'Content-Type': 'text/plain' });
     res.end('403 Forbidden');
     return;
   }
 
-  fs.stat(filePath, (err, stats) => {
+  fs.stat(targetFile, (err, stats) => {
     if (err || !stats.isFile()) {
-      // If requesting /mcp via browser GET, return informative status
-      if (pathname === '/mcp') {
-        res.writeHead(200, { 'Content-Type': 'application/json' });
-        res.end(JSON.stringify({
-          message: 'UnifyApps Remote MCP Server is active.',
-          endpoint: 'POST /mcp',
-          protocol: 'JSON-RPC 2.0',
-          status: 'ready',
-          tools: TOOLS.map(t => t.name)
-        }, null, 2));
-        return;
-      }
-
-      // Default fallback to index.html for SPA-style routing
-      const indexFallback = path.join(__dirname, 'index.html');
-      fs.readFile(indexFallback, (err2, content) => {
+      // Default fallback to dist/index.html (or index.html) for React SPA-style routing
+      const fallbackHtml = hasDist ? path.join(distDir, 'index.html') : path.join(__dirname, 'index.html');
+      fs.readFile(fallbackHtml, (err2, content) => {
         if (err2) {
           res.writeHead(404, { 'Content-Type': 'text/plain' });
           res.end('404 Not Found');
@@ -468,11 +471,11 @@ const server = http.createServer(async (req, res) => {
       return;
     }
 
-    const ext = path.extname(filePath).toLowerCase();
+    const ext = path.extname(targetFile).toLowerCase();
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     res.writeHead(200, { 'Content-Type': contentType });
-    fs.createReadStream(filePath).pipe(res);
+    fs.createReadStream(targetFile).pipe(res);
   });
 });
 

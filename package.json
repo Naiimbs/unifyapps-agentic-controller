@@ -1,27 +1,38 @@
 {
   "name": "unifyapps-agentic-controller",
-  "version": "1.0.0",
-  "description": "Universal UnifyApps Model Context Protocol (MCP) Server & Agentic Bridge",
+  "version": "2.0.0",
+  "description": "Universal UnifyApps Model Context Protocol (MCP) Server & Full-Stack React Agentic Controller",
   "main": "server.js",
-  "bin": {
-    "unifyapps-bridge": "./unifyapps_bridge.js",
-    "unifyapps-agentic-controller": "./unifyapps_bridge.js"
-  },
+  "type": "commonjs",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
     "start": "node server.js",
-    "build": "node -e \"console.log('Build ready')\"",
-    "test": "node scratch/test_sse_mcp.js",
+    "server": "node server.js",
     "mcp": "node unifyapps_bridge.js --mcp",
-    "server": "node server.js"
+    "test": "node scratch/test_sse_mcp.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.21.1",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-react": "^4.3.4",
+    "autoprefixer": "^10.4.20",
+    "postcss": "^8.4.49",
+    "tailwindcss": "^3.4.16",
+    "vite": "^6.0.1"
   },
   "keywords": [
     "mcp",
     "model-context-protocol",
     "unifyapps",
+    "react",
     "agentic-ai",
     "antigravity",
-    "manus",
-    "cursor"
+    "manus"
   ],
   "author": "Naiim Bsili <hi@naiimbsili.com>",
   "license": "MIT",

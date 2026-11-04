@@ -1,17 +1,20 @@
-# Lightweight production Node.js container
-FROM node:20-alpine
-
+# Multi-stage production build for React + MCP Server
+FROM node:20-alpine AS builder
 WORKDIR /app
+COPY package*.json ./
+RUN npm install
+COPY . .
+RUN npm run build
 
-# Copy application code and assets
-COPY package.json ./
-COPY server.js ./
-COPY unifyapps_bridge.js ./
-COPY index.html ./
-COPY guide.html ./
-COPY assets/ ./assets/
+# Production runner image
+FROM node:20-alpine
+WORKDIR /app
+COPY package*.json ./
+RUN npm install --omit=dev
+COPY --from=builder /app/dist ./dist
+COPY server.js unifyapps_bridge.js ./
+COPY assets ./assets
 
-# Default environment variables
 ENV PORT=3000
 ENV HOST=0.0.0.0
 ENV NODE_ENV=production
