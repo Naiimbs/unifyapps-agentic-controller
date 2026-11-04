@@ -1,0 +1,19 @@
+version: '3.8'
+
+services:
+  unifyapps-agentic-controller:
+    build: .
+    container_name: unifyapps-mcp-server
+    restart: unless-stopped
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - HOST=0.0.0.0
+      - UNIFY_BASE_URL=https://unifyapps-dev.modhs.med.sa
+      - UNIFY_CLIENT_ID=6aeaedcf41af9153531ebb1f
+    healthcheck:
+      test: ["CMD", "node", "-e", "fetch('http://localhost:3000/health').then(r=>{if(!r.ok)process.exit(1)}).catch(()=>process.exit(1))"]
+      interval: 30s
+      timeout: 5s
+      retries: 3

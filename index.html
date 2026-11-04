@@ -711,24 +711,33 @@ const response = await mcp.callTool('unify_get_page_blocks', {
         <!-- Manus -->
         <div id="content-manus" class="tab-content block">
           <div class="flex justify-between items-center pb-3 mb-3 border-b border-slate-800 text-slate-400">
-            <span>Manus Connector Setup (Linux Container Path)</span>
+            <div>
+              <span class="text-mod-gold font-bold">Recommended: Remote Cloud MCP (No local files or cloning required)</span>
+              <span class="block text-[11px] text-slate-500">Works directly in Manus Cloud Runner without path errors</span>
+            </div>
             <button onclick="copySnippet('snippet-manus')" class="text-mod-gold hover:underline">Copy Config</button>
           </div>
           <pre id="snippet-manus" class="overflow-x-auto text-amber-300 leading-relaxed">{
   "mcpServers": {
     "unifyapps": {
-      "command": "node",
-      "args": [
-        "/home/ubuntu/unifyapps-agentic-controller/unifyapps_bridge.js",
-        "--mcp"
-      ],
-      "env": {
-        "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
-        "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
-      }
+      "url": "https://unifyapps-agentic-controller.mhaf.cloud/mcp"
     }
   }
 }</pre>
+          <div class="mt-4 pt-3 border-t border-slate-800">
+            <div class="text-[11px] text-slate-400 font-bold mb-1">Alternative: Server-Sent Events (SSE) Endpoint</div>
+            <pre class="overflow-x-auto text-slate-300 text-[11px]">{
+  "mcpServers": {
+    "unifyapps": {
+      "type": "sse",
+      "url": "https://unifyapps-agentic-controller.mhaf.cloud/mcp/sse"
+    }
+  }
+}</pre>
+          </div>
+          <div class="mt-3 pt-2 text-[11px] text-slate-500">
+            <span>Local Stdio fallback: <code>node /path/to/unifyapps_bridge.js --mcp</code></span>
+          </div>
         </div>
 
         <!-- Antigravity -->

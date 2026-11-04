@@ -505,29 +505,27 @@
         <div class="bg-slate-950 rounded-2xl p-6 sm:p-8 border border-slate-800 flex flex-col justify-between">
           <div>
             <div class="flex items-center justify-between mb-4">
-              <span class="px-2.5 py-1 rounded bg-mod-gold/20 text-amber-300 border border-mod-gold/40 text-xs font-mono font-bold">MANUS (LINUX CONTAINER)</span>
-              <span class="text-xs text-emerald-400 font-semibold">✓ Dual Stdio & HTTP Mode</span>
+              <span class="px-2.5 py-1 rounded bg-mod-gold/20 text-amber-300 border border-mod-gold/40 text-xs font-mono font-bold">MANUS (REMOTE CLOUD MCP)</span>
+              <span class="text-xs text-emerald-400 font-semibold">✓ Recommended for Manus</span>
             </div>
             <p class="text-sm text-slate-300 leading-relaxed mb-4">
-              Clone the repository inside Manus and add the connector using a Linux path:
+              Connect directly via the hosted HTTPS/SSE endpoint on <code>mhaf.cloud</code> without any local file path or container cloning dependencies:
             </p>
             <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto text-amber-200 mb-4">
 {
   "mcpServers": {
     "unifyapps": {
-      "command": "node",
-      "args": ["/home/ubuntu/unifyapps-agentic-controller/unifyapps_bridge.js", "--mcp"],
-      "env": {
-        "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
-        "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
-      }
+      "url": "https://unifyapps-agentic-controller.mhaf.cloud/mcp"
     }
   }
 }
             </div>
+            <div class="text-xs text-slate-400 mb-2 font-mono">
+              Or SSE protocol mode: <code>https://unifyapps-agentic-controller.mhaf.cloud/mcp/sse</code>
+            </div>
           </div>
           <div class="p-3 bg-slate-900/60 rounded-xl border border-slate-800 text-xs text-slate-400">
-            <strong>Key Fix Verified:</strong> <code class="text-emerald-400">unifyapps_bridge.js</code> handles JSON-RPC 2.0 on stdio with zero logging on stdout, preventing Manus parser crash.
+            <strong>Zero Container Dependency:</strong> Eliminates <code class="text-amber-400">"Cannot find module"</code> and file path errors inside ephemeral cloud sandbox environments.
           </div>
         </div>
 
