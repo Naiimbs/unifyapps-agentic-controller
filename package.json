@@ -9,6 +9,8 @@
   },
   "scripts": {
     "start": "node server.js",
+    "build": "node -e \"console.log('Build ready')\"",
+    "test": "node scratch/test_sse_mcp.js",
     "mcp": "node unifyapps_bridge.js --mcp",
     "server": "node server.js"
   },
