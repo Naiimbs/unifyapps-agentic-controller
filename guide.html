@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Step-by-Step Implementation Guide & Visual Proof | UnifyApps Agentic Bridge</title>
+  <meta name="description" content="Visual guide with real UnifyApps platform screenshots showing API Gateway, MCP Server, A2A Server, and Block-Scoped Custom CSS in action.">
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            mod: {
+              green: '#125939',
+              greenDark: '#0b3824',
+              greenLight: '#1b7d51',
+              gold: '#dba102',
+              goldLight: '#f5b81a',
+              surface: '#f8fafc',
+              border: '#e2e8f0',
+              text: '#0f172a'
+            }
+          },
+          fontFamily: {
+            sans: ['Inter', 'system-ui', '-apple-system', 'Segoe UI', 'Roboto', 'sans-serif'],
+            mono: ['JetBrains Mono', 'Fira Code', 'monospace']
+          }
+        }
+      }
+    }
+  </script>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    body { font-family: 'Inter', sans-serif; }
+    pre, code { font-family: 'JetBrains Mono', monospace; }
+    .badge-pulse { animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
+    @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: .5; } }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; height: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f5f9; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased selection:bg-mod-green selection:text-white">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <a href="index.html" class="flex items-center gap-3 hover:opacity-90 transition-opacity">
+          <div class="w-10 h-10 rounded-xl bg-mod-green flex items-center justify-center text-white font-bold text-xl shadow-sm border border-mod-greenDark">
+            U
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="font-bold text-slate-900 text-lg tracking-tight">UnifyApps</span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-mod-green/10 text-mod-green font-semibold border border-mod-green/20">Visual Guide</span>
+            </div>
+            <span class="text-xs text-slate-500 hidden sm:inline">Real Platform Verification & Examples</span>
+          </div>
+        </a>
+      </div>
+
+      <nav class="hidden md:flex items-center gap-6 text-sm font-medium text-slate-600">
+        <a href="index.html" class="hover:text-mod-green transition-colors">Overview</a>
+        <a href="#visual-proof" class="hover:text-mod-green transition-colors">Visual Evidence</a>
+        <a href="#setup-guide" class="hover:text-mod-green transition-colors">Setup Guide</a>
+        <a href="#antigravity-manus" class="hover:text-mod-green transition-colors">Antigravity & Manus</a>
+        <a href="#remote-mcp" class="hover:text-mod-green transition-colors">Remote MCP Cloud</a>
+      </nav>
+
+      <div class="flex items-center gap-3">
+        <a href="index.html#simulator" class="hidden sm:inline-flex items-center gap-2 px-3.5 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold transition-all">
+          Launch Simulator
+        </a>
+        <a href="https://github.com/Naiimbs/unifyapps-agentic-controller" target="_blank" class="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-mod-green hover:bg-mod-greenDark text-white text-xs font-semibold shadow-sm transition-all shadow-mod-green/20">
+          GitHub
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Title Banner -->
+  <section class="pt-12 pb-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="max-w-4xl">
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-xs font-bold uppercase tracking-wider text-mod-green px-3 py-1 rounded-full bg-mod-green/10 border border-mod-green/20">Verified Evidence & Documentation</span>
+          <span class="text-xs text-slate-400">Updated November 2026</span>
+        </div>
+        <h1 class="text-3xl sm:text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
+          Visual Platform Guide: Configuring & Using API, MCP, and A2A in UnifyApps
+        </h1>
+        <p class="mt-4 text-slate-600 text-base sm:text-lg leading-relaxed">
+          A complete walkthrough illustrated with <strong class="text-slate-900 font-semibold">real screenshots captured from the live UnifyApps tenant</strong> (<code class="text-xs bg-slate-100 px-1.5 py-0.5 rounded font-mono text-mod-green">unifyapps-dev.modhs.med.sa</code>). Learn how to set up each integration layer, verify block-scoped custom CSS, and execute workflows from external AI tools like <strong class="text-slate-900 font-semibold">Antigravity</strong> and <strong class="text-slate-900 font-semibold">Manus</strong>.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 1: VISUAL PROOF & REAL SCREENSHOTS
+       ========================================================================= -->
+  <section id="visual-proof" class="py-16 bg-slate-50 border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green">Part 1</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Real Platform Verification Screenshots</h2>
+        <p class="text-slate-600 text-sm mt-1">Direct captures from the live session demonstrating surgical block scoping and component properties.</p>
+      </div>
+
+      <!-- Screenshot 1: Real Builder Proof -->
+      <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm mb-12">
+        <div class="p-6 border-b border-slate-100 flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-50/50">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+              <h3 class="text-lg font-bold text-slate-900">Live Verification: Scoped CSS Applied to Sandbox</h3>
+            </div>
+            <p class="text-xs text-slate-500 mt-1">App: <code class="font-mono text-slate-700">agent-sandbox-test</code> | Block: <code class="font-mono text-mod-green font-bold">[data-block-id='root_id']</code></p>
+          </div>
+          <div class="flex items-center gap-2 text-xs">
+            <span class="px-2.5 py-1 rounded bg-emerald-100 text-emerald-800 font-semibold">Computed: border 2px solid #125939</span>
+            <span class="px-2.5 py-1 rounded bg-slate-100 text-slate-700 font-semibold">border-radius: 16px</span>
+          </div>
+        </div>
+        <div class="p-4 sm:p-6 bg-slate-900 text-center">
+          <img src="assets/images/real-builder-proof.png" alt="Real UnifyApps Builder Proof showing root_id with green border and Monaco CSS" class="rounded-xl shadow-lg border border-slate-700 max-h-[550px] mx-auto object-contain">
+        </div>
+        <div class="p-5 text-xs text-slate-600 bg-white grid grid-cols-1 md:grid-cols-3 gap-4 border-t border-slate-100">
+          <div>
+            <strong class="text-slate-800 block mb-1">1. Live Canvas Stroke:</strong>
+            The canvas renders the green border (<code class="font-mono">#125939</code>) and 16px radius without distorting headers, buttons, or page menus.
+          </div>
+          <div>
+            <strong class="text-slate-800 block mb-1">2. Properties Drawer:</strong>
+            UnifyApps exposes <code class="font-mono">HTML Attributes</code> (Key/Value table) and <code class="font-mono">Custom CSS</code> (Monaco Editor) per component.
+          </div>
+          <div>
+            <strong class="text-slate-800 block mb-1">3. Persistent Storage:</strong>
+            Styles are saved directly into the UnifyApps AST database, ensuring portability across environments and users.
+          </div>
+        </div>
+      </div>
+
+      <!-- Grid of Secondary Screenshots -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        
+        <!-- Screenshot 2: Context Menu -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+            <h4 class="text-sm font-bold text-slate-900">Component 3-Dots Context Menu</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Accessing HTML Attributes and Custom CSS</p>
+          </div>
+          <div class="p-3 bg-slate-100 flex-1 flex items-center justify-center min-h-[280px]">
+            <img src="assets/images/component-properties-menu.png" alt="Component 3-Dots Menu" class="rounded-lg shadow border border-slate-200 max-h-[260px] object-contain">
+          </div>
+          <div class="p-4 text-xs text-slate-600 border-t border-slate-100">
+            Clicking the 3-dots icon on any component (<code class="font-mono">filters</code>) opens the menu containing <strong>HTML Attributes</strong> and <strong>Custom CSS</strong>.
+          </div>
+        </div>
+
+        <!-- Screenshot 3: Custom CSS Drawer -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+            <h4 class="text-sm font-bold text-slate-900">Scoped Monaco Editor</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Enforcing [data-block-id='...']</p>
+          </div>
+          <div class="p-3 bg-slate-100 flex-1 flex items-center justify-center min-h-[280px]">
+            <img src="assets/images/monaco-custom-css-drawer.png" alt="Custom CSS Drawer" class="rounded-lg shadow border border-slate-200 max-h-[260px] object-contain">
+          </div>
+          <div class="p-4 text-xs text-slate-600 border-t border-slate-100">
+            UnifyApps automatically scopes the code block to <code class="font-mono">[data-block-id='b_cvQmi']</code>, proving our mathematical isolation guarantee.
+          </div>
+        </div>
+
+        <!-- Screenshot 4: Module & Template Components -->
+        <div class="bg-white rounded-2xl border border-slate-200 overflow-hidden shadow-sm flex flex-col">
+          <div class="p-4 border-b border-slate-100 bg-slate-50/50">
+            <h4 class="text-sm font-bold text-slate-900">Reusable Template Modules</h4>
+            <p class="text-[11px] text-slate-500 mt-0.5">Cross-App Component Distribution</p>
+          </div>
+          <div class="p-3 bg-slate-100 flex-1 flex items-center justify-center min-h-[280px]">
+            <img src="assets/images/module-template-components.png" alt="Module Template Components" class="rounded-lg shadow border border-slate-200 max-h-[260px] object-contain">
+          </div>
+          <div class="p-4 text-xs text-slate-600 border-t border-slate-100">
+            Under <strong>Add Component → Module</strong>, packaged template components (<code class="font-mono">DGA_Carousal</code>, <code class="font-mono">DGA_header_Act</code>) can be dropped into any app.
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 2: STEP-BY-STEP SETUP IN UNIFYAPPS
+       ========================================================================= -->
+  <section id="setup-guide" class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green">Part 2</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">How to Add & Activate the 3 Primitives in UnifyApps</h2>
+        <p class="text-slate-600 text-sm mt-1">Exact platform paths, form fields, and configuration steps.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+        
+        <!-- Step 1: API Gateway -->
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-purple-100 text-purple-700 font-bold flex items-center justify-center text-sm mb-4">
+            A
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">1. API Platform Client</h3>
+          <div class="text-xs font-mono text-purple-700 bg-purple-50 p-2 rounded mb-4">
+            Route: /p/0/api-platform/clients
+          </div>
+          <ol class="text-xs text-slate-600 space-y-2.5 list-decimal pl-4">
+            <li>Open the left sidebar and click <strong>API Platform</strong>.</li>
+            <li>Click <strong>Clients</strong> tab, then <strong>New Client</strong>.</li>
+            <li>Enter Name: <code class="font-mono text-slate-800">Antigravity-Agent-Bridge</code>.</li>
+            <li>Assign Access Profiles: Check <code class="font-mono">interfaces</code>, <code class="font-mono">connectors</code>, <code class="font-mono">workflows</code>.</li>
+            <li>Click <strong>Create</strong>. Copy the generated Client ID (<code class="font-mono font-bold text-slate-800">6aeaedcf41af9153531ebb1f</code>).</li>
+          </ol>
+        </div>
+
+        <!-- Step 2: MCP Server -->
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-blue-100 text-blue-700 font-bold flex items-center justify-center text-sm mb-4">
+            B
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">2. MCP Server Configuration</h3>
+          <div class="text-xs font-mono text-blue-700 bg-blue-50 p-2 rounded mb-4">
+            Route: /p/0/mcp-servers
+          </div>
+          <ol class="text-xs text-slate-600 space-y-2.5 list-decimal pl-4">
+            <li>In the left sidebar, navigate to <strong>AI Agents → MCP Servers</strong>.</li>
+            <li>Click <strong>New MCP Server</strong>.</li>
+            <li>Name: <code class="font-mono text-slate-800">Antigravity-Unify-MCP</code>.</li>
+            <li>In the <strong>Tools</strong> tab, click <strong>Add Tool</strong> to attach actions from your Custom Connectors.</li>
+            <li>Under <strong>Settings</strong>, enable tool subscriptions.</li>
+          </ol>
+        </div>
+
+        <!-- Step 3: A2A Server -->
+        <div class="p-6 rounded-2xl bg-slate-50 border border-slate-200">
+          <div class="w-10 h-10 rounded-xl bg-emerald-100 text-emerald-700 font-bold flex items-center justify-center text-sm mb-4">
+            C
+          </div>
+          <h3 class="text-lg font-bold text-slate-900 mb-2">3. A2A Multi-Agent Server</h3>
+          <div class="text-xs font-mono text-emerald-700 bg-emerald-50 p-2 rounded mb-4">
+            Route: /p/0/a2a-servers
+          </div>
+          <ol class="text-xs text-slate-600 space-y-2.5 list-decimal pl-4">
+            <li>Navigate to <strong>AI Agents → A2A Servers</strong>.</li>
+            <li>Click <strong>New A2A Server</strong>.</li>
+            <li>Name: <code class="font-mono text-slate-800">Antigravity-Unify-A2A</code>.</li>
+            <li>Under <strong>Select Agent or Team</strong>, select <strong class="text-emerald-700">App page builder</strong> (<code class="font-mono">e_69b267ec5725553d7a82c3ed</code>).</li>
+            <li>Click <strong>Create</strong>, then click <strong class="text-emerald-700">Deploy</strong>. Status will turn to <span class="text-emerald-700 font-bold">Active</span>!</li>
+          </ol>
+        </div>
+
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 3: USING WITH ANTIGRAVITY & MANUS
+       ========================================================================= -->
+  <section id="antigravity-manus" class="py-16 bg-slate-900 text-slate-100 border-b border-slate-800">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-gold">Part 3</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">How to Use from External AI Tools (Antigravity & Manus)</h2>
+        <p class="text-slate-400 text-sm mt-1">Configuring JSON-RPC 2.0 stdio execution for local and cloud agent runtimes.</p>
+      </div>
+
+      <!-- Manus Instructions Box -->
+      <div class="bg-slate-950 rounded-2xl p-6 sm:p-8 border border-slate-800 mb-8">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="px-2.5 py-1 rounded bg-blue-500/20 text-blue-400 border border-blue-500/30 text-xs font-mono font-bold">MANUS (Linux Cloud Agent)</span>
+          <span class="text-xs text-emerald-400 font-semibold">✓ Fully Tested & Resolved</span>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+          In Manus, the agent clones your GitHub repository <code class="text-xs bg-slate-800 px-1 py-0.5 rounded font-mono text-emerald-400">https://github.com/Naiimbs/unifyapps-agentic-controller</code> into its Linux environment. The updated <code class="text-xs bg-slate-800 px-1 py-0.5 rounded font-mono">unifyapps_bridge.js</code> now implements the full JSON-RPC 2.0 stdio protocol.
+        </p>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs font-mono">
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <div class="text-slate-400 font-bold mb-2">Manus Execution Command:</div>
+            <pre class="text-emerald-400 leading-relaxed">node /home/ubuntu/unifyapps_bridge.js</pre>
+            <div class="text-[11px] text-slate-500 mt-2">Outputs pure JSON-RPC on stdout. All debug logs stream to stderr.</div>
+          </div>
+          <div class="bg-slate-900 p-4 rounded-xl border border-slate-800">
+            <div class="text-slate-400 font-bold mb-2">Supported Manus Prompts:</div>
+            <div class="text-slate-300 space-y-1.5">
+              <div>• "List all my UnifyApps applications"</div>
+              <div>• "Inspect blocks on media-center-app/myspace"</div>
+              <div>• "Style the filters block with Saudi MOD green theme"</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Antigravity Instructions Box -->
+      <div class="bg-slate-950 rounded-2xl p-6 sm:p-8 border border-slate-800">
+        <div class="flex items-center gap-3 mb-4">
+          <span class="px-2.5 py-1 rounded bg-mod-green/20 text-emerald-400 border border-mod-green/40 text-xs font-mono font-bold">ANTIGRAVITY IDE</span>
+          <span class="text-xs text-emerald-400 font-semibold">✓ Native Direct Loopback</span>
+        </div>
+        <p class="text-sm text-slate-300 leading-relaxed mb-4">
+          Add the connector configuration to your Antigravity MCP settings:
+        </p>
+        <div class="bg-slate-900 p-4 rounded-xl border border-slate-800 font-mono text-xs overflow-x-auto text-emerald-400">
+{
+  "mcpServers": {
+    "unifyapps": {
+      "command": "node",
+      "args": ["./unifyapps_bridge.js"],
+      "env": {
+        "UNIFY_BASE_URL": "https://unifyapps-dev.modhs.med.sa",
+        "UNIFY_CLIENT_ID": "6aeaedcf41af9153531ebb1f"
+      }
+    }
+  }
+}
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- =========================================================================
+       SECTION 4: REMOTE MCP SERVER (*.mhaf.cloud)
+       ========================================================================= -->
+  <section id="remote-mcp" class="py-16 bg-white border-b border-slate-200">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      
+      <div class="mb-12">
+        <span class="text-xs font-bold uppercase tracking-wider text-mod-green">Part 4</span>
+        <h2 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-1">Remote MCP Server Hosting (*.mhaf.cloud)</h2>
+        <p class="text-slate-600 text-sm mt-1">Connecting cloud AI agents without requiring local node process execution.</p>
+      </div>
+
+      <div class="bg-slate-50 rounded-2xl p-6 sm:p-8 border border-slate-200 max-w-4xl mx-auto">
+        <div class="flex items-center justify-between mb-4">
+          <h3 class="text-lg font-bold text-slate-900">HTTP / SSE Remote Endpoint</h3>
+          <span class="text-xs font-mono bg-emerald-100 text-emerald-800 px-2.5 py-0.5 rounded font-bold">Hosted Live</span>
+        </div>
+        <p class="text-sm text-slate-600 mb-4">
+          You deployed this project to <strong class="text-slate-800">https://unifyapps-agentic-controller.mhaf.cloud</strong>. The updated <code class="font-mono text-xs bg-slate-200 px-1 py-0.5 rounded">unifyapps_bridge.js</code> supports remote execution via <code class="font-mono text-xs bg-slate-200 px-1 py-0.5 rounded">--http</code>:
+        </p>
+
+        <div class="bg-slate-900 text-slate-200 p-4 rounded-xl font-mono text-xs space-y-2 mb-6 overflow-x-auto">
+          <div><span class="text-slate-400"># Start as remote HTTP / SSE server:</span></div>
+          <div class="text-emerald-400">node unifyapps_bridge.js --http --port 3000</div>
+          <div class="pt-2"><span class="text-slate-400"># Endpoints available:</span></div>
+          <div>GET  https://unifyapps-agentic-controller.mhaf.cloud/health</div>
+          <div>GET  https://unifyapps-agentic-controller.mhaf.cloud/tools</div>
+          <div>POST https://unifyapps-agentic-controller.mhaf.cloud/mcp (JSON-RPC 2.0)</div>
+        </div>
+
+        <div class="p-4 rounded-xl bg-blue-50 border border-blue-200 text-xs text-blue-900">
+          <strong>Tip for Manus & Cloud Clients:</strong> When configuring remote MCP, specify the URL <code class="font-mono font-bold">https://unifyapps-agentic-controller.mhaf.cloud/mcp</code>. Manus can call tools over HTTPS without needing local files!
+        </div>
+      </div>
+
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-slate-950 text-slate-400 py-12 text-xs">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-4">
+      <div>
+        <span class="font-bold text-white">UnifyApps Autonomous Agentic Controller</span> • Saudi MODHS Digital Services
+      </div>
+      <div class="flex items-center gap-6">
+        <a href="index.html" class="hover:text-white transition-colors">Home</a>
+        <a href="index.html#simulator" class="hover:text-white transition-colors">Simulator</a>
+        <a href="https://github.com/Naiimbs/unifyapps-agentic-controller" target="_blank" class="hover:text-white transition-colors">GitHub Repository</a>
+      </div>
+    </div>
+  </footer>
+
+</body>
+</html>

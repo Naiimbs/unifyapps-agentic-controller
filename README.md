@@ -14,10 +14,30 @@ An enterprise integration bridge and autonomous design controller allowing **any
 
 ---
 
-## 🌟 Interactive Live Demo Platform
+## 🌟 Interactive Live Demo & Visual Proof
 
-Experience the interactive guide, live block-scoping simulator, and configuration hub:
-👉 **[Open Live Demo & Guide Platform](https://naiimbs.github.io/unifyapps-agentic-controller/)**
+* 🌐 **Interactive Demo Platform**: 👉 **[https://naiimbs.github.io/unifyapps-agentic-controller/](https://naiimbs.github.io/unifyapps-agentic-controller/)**
+* 📸 **Step-by-Step Guide with Real Screenshots**: 👉 **[https://naiimbs.github.io/unifyapps-agentic-controller/guide.html](https://naiimbs.github.io/unifyapps-agentic-controller/guide.html)**
+* ☁️ **Remote MCP Server (Cloud)**: 👉 **`https://unifyapps-agentic-controller.mhaf.cloud/mcp`**
+
+---
+
+## 🤖 AI Agent Setup (Manus, Antigravity, Cursor, Claude)
+
+### Option 1: Manus (Autonomous Linux Agent)
+In Manus, clone this repository and execute:
+```bash
+# In Manus Linux environment (/home/ubuntu):
+git clone https://github.com/Naiimbs/unifyapps-agentic-controller.git
+cd unifyapps-agentic-controller
+node unifyapps_bridge.js
+```
+The bridge implements the complete **MCP JSON-RPC 2.0 stdio protocol** (`initialize`, `notifications/initialized`, `tools/list`, `tools/call`, `ping`). Output streams pure JSON-RPC on `stdout`, directing all diagnostics to `stderr`.
+
+Or configure the remote endpoint directly in Manus:
+```
+Server URL: https://unifyapps-agentic-controller.mhaf.cloud/mcp
+```
 
 ---
 
