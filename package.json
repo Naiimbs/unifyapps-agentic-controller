@@ -1,0 +1,28 @@
+{
+  "name": "unifyapps-agentic-controller",
+  "version": "1.0.0",
+  "description": "Universal UnifyApps Model Context Protocol (MCP) Server & Agentic Bridge",
+  "main": "unifyapps_bridge.js",
+  "bin": {
+    "unifyapps-bridge": "./unifyapps_bridge.js",
+    "unifyapps-agentic-controller": "./unifyapps_bridge.js"
+  },
+  "scripts": {
+    "start": "node unifyapps_bridge.js --mcp",
+    "server": "node unifyapps_bridge.js --http --port 3000"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "unifyapps",
+    "agentic-ai",
+    "antigravity",
+    "manus",
+    "cursor"
+  ],
+  "author": "Naiim Bsili <hi@naiimbsili.com>",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
